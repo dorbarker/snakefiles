@@ -1,0 +1,10 @@
+reference: 'somestrain.fasta'
+
+fastqs: 'fastqs/'
+snyphyl_outdir: 'output/snyphyl'
+mentalist_outdir: 'output/mlst'
+cgmlst_alleles: 'cgmlst_alleles/'
+wgmlst_alleles: 'wgmlst_alleles/'
+mentalist_wg_db: 'wgmlst_alleles/wgmlst.db'
+mentalist_cg_db: 'cgmlst_alleles/cgmlst.db'
+kmer_size: 10
