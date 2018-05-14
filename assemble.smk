@@ -40,28 +40,6 @@ rule assemble:
 		"--trim --cpus {threads}; "
 		"rm -r tmp/{wildcards.sample} "
 
-
-# rule copy_reads:
-# 	input:
-# 		unpack(partial(match_sample_to_fq,
-# 					   path=os.path.join(config['fastqs'])))
-# 	output:
-# 		partial(match_sample_to_fq,
-# 					   path=os.path.join(config['tmp'], '{sample}'))()
-#
-# 	message:
-# 		'copy_reads {input} {output}'
-# 	run:
-# 		print(input, output)
-# 		for i, o in zip((input.fwd, input.rev), (output.fwd, output.rev)):
-# 			link_device = os.stat(input.fwd, follow_symlinks=False).st_dev
-# 			target_device = os.stat(input.rev, follow_symlinks=True).st_dev
-#
-# 			if link_device != target_device:
-# 				shutil.copyfile(i, o)
-# 			else:
-# 				os.symlink(i, o)
-
 rule symlink_genome:
 	input:
 		'shovill_output/{sample}/contigs.fa'
