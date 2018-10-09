@@ -1,63 +1,14 @@
-library(ape)
 library(reshape2)
 library(getopt)
-library(stringr)
 
-arguments <- function() {
+calc_melted_dm <- function(infile, outfile, delimiter) {
 
-    spec <- matrix(c(
-        'help',      'h', 0, 'logical',
-        'calls',     'i', 1, 'character',
-        'delimiter', 'd', 1, 'character'
-    ), byrow = TRUE, ncol = 4)
+    distance_matrix <- read.table(infile,
+                                  sep = delimiter,
+                                  header = TRUE,
+                                  row.names = 1)
 
-    opt <- getopt(spec)
-
-    if (!is.null(opt$help)) {
-        cat(getopt(spec, usage = TRUE))
-        quit(status = 0)
-    }
-
-    if (is.null(opt$calls)) {
-        cat("Must provide table of calls\n")
-        quit(status = 1)
-    }
-
-    if (is.null(opt$delimiter)) {
-        opt$delimiter <- '\t'
-    }
-
-    opt
-}
-
-get_outname <- function(calls_file) {
-    path_parts <- str_split(calls_file, '/')[[1]]
-
-    root <- path_parts[1:(length(path_parts)-1)]
-
-    basename_ext <- str_split(path_parts[length(path_parts)], '\\.')[[1]]
-
-    basename <- basename_ext[1]
-
-    ext <- basename_ext[2]
-
-    out_basename <- paste0(basename, '_melted.', ext)
-
-    outpath <- paste(paste(root, collapse = '/'), out_basename, sep = '/')
-
-    outpath
-}
-
-process <- function(calls_file, delimiter) {
-
-    calls <- read.table(calls_file,
-                        sep = delimiter,
-                        header = TRUE,
-                        row.names = 1)
-
-    calls[] <- lapply(calls, function(x) {x[x < 1] <- NA; x})
-
-    distance <- dist.gene(calls, pairwise.deletion = TRUE)
+    distance <- as.dist(as.matrix(distance_matrix))
 
     melted <- melt(as.matrix(distance))
 
@@ -70,18 +21,10 @@ process <- function(calls_file, delimiter) {
     colnames(melted) <- c('genome1', 'genome2', 'distance')
 
     write.table(melted,
-                file = get_outname(calls_file),
+                file = outfile,
                 sep = delimiter,
                 quote = FALSE,
                 row.names = FALSE)
 }
 
-main <- function() {
-
-    args <- arguments()
-
-    process(args$calls, args$delimiter)
-
-}
-
-main()
+calc_melted_dm(snakemake@input[[1]], snakemake@output[[1]], delimiter = ',')

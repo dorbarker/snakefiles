@@ -6,9 +6,6 @@ GENOMES = 'genomes'
 ALLELES = 'alleles'
 TEMPDIR = 'tmp'
 
-MARKERSFILE = next(Path().glob('*.markers'))
-TESTNAME = MARKERSFILE.stem
-
 NAMES = [Path(fasta).stem for fasta in Path(GENOMES).glob('*.fasta')]
 
 ruleorder: update > create_table
