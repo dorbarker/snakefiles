@@ -6,9 +6,6 @@ GENOMES = 'genomes'
 ALLELES = 'alleles'
 TEMPDIR = 'tmp'
 
-MARKERSFILE = next(Path().glob('*.markers'))
-TESTNAME = MARKERSFILE.stem
-
 NAMES = [Path(fasta).stem for fasta in Path(GENOMES).glob('*.fasta')]
 
 ruleorder: update > create_table
@@ -17,7 +14,7 @@ rule cgmlst:
 	input:
 		'pristine.csv'
 
-rule mist:
+rule call:
 	input:
 		'genomes/{name}.fasta'
 
@@ -28,27 +25,30 @@ rule mist:
 		1
 
 	shell:
-		"/home/dbarker/bin/mist_bin/MIST.exe "
-		"-a {ALLELES} -T {TEMPDIR} -t {MARKERSFILE} -b -j {output} {input}"
-
+		'fsac call -a {ALLELES} -i {input} -o {output}'
 
 rule update:
 	input:
 		expand('{JSONDIR}/{name}.json', JSONDIR=JSONDIR, name=NAMES)
+
+
 	output:
 		touch('.updated')
+
 	shell:
-		"python {workflow.basedir}/update_definitions.py "
-		"-j jsons/ -t {TESTNAME} -a {ALLELES}"
+		'fsac update -a {ALLELES} -j {JSONDIR}'
 
 rule create_table:
 	input:
 		expand('{JSONDIR}/{name}.json', JSONDIR=JSONDIR, name=NAMES),
 		'.updated'
+
 	output:
 		'calls.csv'
+
 	shell:
-		'python {workflow.basedir}/json2csv.py -j jsons/ -t {TESTNAME} -o {output}'
+		'fsac tabulate -j {JSONDIR} -o {output} -d ,'
+
 
 rule create_pristine:
 	input:

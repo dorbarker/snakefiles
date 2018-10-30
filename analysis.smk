@@ -21,6 +21,8 @@ rule analyze:
 		'pristine.csv',
 		'cgf_prediction.csv',
 		'pristine_distance_matrix.csv',
+		'melted_distance_matrix.csv',
+		'melted_pristine_distance_matrix.csv',
 		'missing_data_histogram.png'
 
 rule ecgf:
@@ -38,7 +40,7 @@ rule distance_matrix:
 		'calls.csv'
 
 	output:
-		'calls_distance_matrix.csv'
+		'distance_matrix.csv'
 
 	script:
 		'scripts/hamming_distance_matrix.py'
@@ -46,7 +48,7 @@ rule distance_matrix:
 rule pristine_distance_matrix:
 	input:
 		'pristine.csv',
-		'calls_distance_matrix.csv'
+		'distance_matrix.csv'
 
 	output:
 		'pristine_distance_matrix.csv'
@@ -67,3 +69,13 @@ rule missing_data_histogram:
 
 	script:
 		'scripts/missing_data_histogram.R'
+
+rule melted_distance_matrix:
+	input:
+		'{dm}'
+
+	output:
+		'melted_{dm}'
+
+	script:
+		'scripts/melted_distance_matrix.R'

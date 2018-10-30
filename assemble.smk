@@ -3,11 +3,15 @@ import shutil
 
 include: 'illumina_reads.py'
 
-def match_sample_to_fq(wildcards):
-	fwd = os.path.join(config['fastqs'], samples[wildcards.sample]['fwd'])
-	rev = os.path.join(config['fastqs'], samples[wildcards.sample]['rev'])
+def match_sample_to_fq(wildcards, path):
+
+	prepend = path.format(sample=wildcards.sample)
+
+	fwd = os.path.join(prepend, samples[wildcards.sample]['fwd'])
+	rev = os.path.join(prepend, samples[wildcards.sample]['rev'])
 
 	return {'r1': fwd, 'r2': rev}
+
 
 rule assemble_genomes:
 	input:
@@ -15,39 +19,26 @@ rule assemble_genomes:
 
 rule assemble:
 	input:
-		fwd=temp(lambda wc: os.path.join(config['temp'], wc.sample, samples[wc.sample]['fwd'])),
-		rev=temp(lambda wc: os.path.join(config['temp'], wc.sample, samples[wc.sample]['rev']))
+		unpack(partial(match_sample_to_fq, path=os.path.join(config['fastqs'])))
 
 	output:
-		'{outdir}/{{sample}}/contigs.fa'.format(config['shovill_output'])
+		'{outdir}/{{sample}}/contigs.fa'.format(outdir=config['shovill_outdir'])
 
+	message:
+		'assemble {input} {output}'
 	threads:
-		8
+		4
 
 	shell:
 		"rmdir shovill_output/{wildcards.sample}; "
-		"shovill --R1 {input.r1} --R2 {input.r2} "
+		"mkdir -p tmp/{wildcards.sample}/fastqs; "
+		"rsync -L {input.r1} tmp/{wildcards.sample}/{input.r1}; "
+		"rsync -L {input.r2} tmp/{wildcards.sample}/{input.r2}; "
+		"shovill --R1 tmp/{wildcards.sample}/{input.r1} "
+		"--R2 tmp/{wildcards.sample}/{input.r2} "
 		"--outdir shovill_output/{wildcards.sample} "
-		"--trim --cpus {threads} "
-
-rule copy_reads:
-	input:
-		fwd=lambda wc: os.path.join(config['fastqs'], samples[wc.sample]['fwd']),
-		rev=lambda wc: os.path.join(config['fastqs'], samples[wc.sample]['rev'])
-
-	output:
-		fwd=temp(lambda wc: os.path.join(config['temp'], wc.sample, samples[wc.sample]['fwd'])),
-		rev=temp(lambda wc: os.path.join(config['temp'], wc.sample, samples[wc.sample]['rev']))
-
-	run:
-		for i, o in zip((input.fwd, input.rev), (output.fwd, output.rev)):
-			link_device = os.stat(input.fwd, follow_symlinks=False).st_dev
-			target_device = os.stat(input.rev, follow_symlinks=True).st_dev
-
-			if link_device != target_device:
-				shutil.copyfile(i, o)
-			else:
-				os.symlink(i, o)
+		"--trim --cpus {threads}; "
+		"rm -r tmp/{wildcards.sample} "
 
 rule symlink_genome:
 	input:
