@@ -5,20 +5,20 @@ import pandas as pd
 __author__ = 'Dillon Barker <dillon.barker@canada.ca>'
 
 def get_accessions_from_runinfo(runinfo_path):
-	
+
 	if isinstance(runinfo_path, bytes):
 		path = runinfo_path.decode()
 	else:
 		path = runinfo_path
 
 	runinfo = pd.read_csv(path, sep=',', header=None)
-	
+
 	return list(runinfo.iloc[:, 0])
 
 rule all:
 	input:
 		runinfo='{0}_runinfo.csv'.format(config['query']),
-		assemblies=expand('genome_fastas/{accession}.fasta',
+		assemblies=expand('genomes/{accession}.fasta',
 			accession=get_accessions_from_runinfo('{0}_runinfo.csv'.format(config['query'])))
 
 rule download_runinfo:
@@ -59,7 +59,7 @@ rule compress_fastq:
 	input:
 		fwd='fastqs/{accession}_1.fastq',
 		rev='fastqs/{accession}_2.fastq'
-	output:	
+	output:
 		fwd='fastqs/{accession}_1.fastq.gz',
 		rev='fastqs/{accession}_2.fastq.gz'
 	shell:
@@ -69,6 +69,28 @@ rule symlink_genome:
 	input:
 		'assemblies/{accession}/contigs.fa'
 	output:
-		'genome_fastas/{accession}.fasta'
+		'genomes/{accession}.fasta'
 	shell:
 		'ln -sr {input} {output}'
+
+rule download_biosample:
+	input:
+		'genomes/{accession}.fasta'
+
+	output:
+		'biosamples/{accession}.biosample'
+
+	shell:
+		'esearch -db sra -query {wildcards.accession} | '
+		'elink -target biosample | '
+		'efetch > {output}'
+
+rule tabulate_biosamples:
+	input:
+		expand('biosamples/{acc}.biosample', acc=get_accessions_from_runinfo(rules.all.input.runinfo))
+
+	output:
+		'metadata.tsv'
+
+	shell:
+		'awk -f scripts/biosample_to_long.awk {input} > {output}'
