@@ -1,0 +1,5 @@
+# conda install -c bioconda -c conda-forge snakemake
+
+acc="PRJNA287430"
+
+snakemake --keep-going -s ~/snakefiles/download_sra.smk -d ~/fsis-campylobacter/${acc} --configfile ~/fsis-campylobacter/${acc}.yaml --cluster-config ~/snakefiles/download_sra-cluster.json --drmaa ' --mem={cluster.mem} -c {threads}' -j 2500
