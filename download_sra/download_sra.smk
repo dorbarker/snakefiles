@@ -29,7 +29,8 @@ rule download_runinfo:
 		'elink -target sra | '
 		'efetch -format runinfo | '
 		'grep GENOMIC | '
-		'grep -v METAGENOMIC > '
+		'grep -v METAGENOMIC | '
+		'grep {config[filter_by]} > '
 		'{output}'
 
 rule assemble:
