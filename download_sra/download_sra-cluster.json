@@ -1,0 +1,14 @@
+{
+        "__default__":
+        {
+                "mem": "1000"
+        },
+        "assemble":
+        {
+                "mem": "16000"
+        },
+        "compress_fastq":
+        {
+                "mem": "2000"
+        }
+}
