@@ -18,9 +18,9 @@ def parse_biosample(biosample):
 
 records = {}
 
-biosample_dir = snakemake.input[0]
+biosamples = snakemake.input
 
-for biosample in biosample_dir.glob('*.biosample'):
+for biosample in biosamples:
 
     sra = biosample.stem
 
