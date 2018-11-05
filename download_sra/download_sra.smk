@@ -15,6 +15,8 @@ def get_accessions_from_runinfo(runinfo_path):
 
 	return list(runinfo.iloc[:, 0])
 
+elink_cmd = 'elink -target sra | ' if config['db'] != 'sra' else ''
+
 rule all:
 	input:
 		runinfo='{0}_runinfo.csv'.format(config['query']),
@@ -25,12 +27,14 @@ rule download_runinfo:
 	output:
 		'{0}_runinfo.csv'.format(config['query'])
 	shell:
-		'esearch -query {config[query]} -db {config[db]} | '
-		'elink -target sra | '
-		'efetch -format runinfo | '
-		'grep GENOMIC | '
-		'grep -v METAGENOMIC > '
-		'{output}'
+		'''
+		esearch -query {{config[query]}} -db {{config[db]}} | {}
+		efetch -format runinfo |
+		grep GENOMIC |
+		grep -v METAGENOMIC |
+		grep {{config[filter_by]}} >
+        {{output}}
+		'''.format(elink_cmd).replace('\n', '')
 
 rule assemble:
 	input:
