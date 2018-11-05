@@ -4,9 +4,7 @@ import os
 include: 'cgmlst.smk'
 include: 'assemble.smk'
 
-fastq_dir = 'fastqs'
-
-fastq_files = sorted(os.listdir(fastq_dir))
+fastq_files = sorted(os.listdir('fastqs'))
 
 match_illumina = '(.+?)(_S\d+_L001)?_(R[12])(_001)?\.f(ast)?q\.?(gz)?'
 sample_pattern = re.compile(match_illumina)

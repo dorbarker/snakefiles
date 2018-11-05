@@ -91,7 +91,8 @@ rule download_biosample:
 
 rule tabulate_biosamples:
 	input:
-		expand('biosamples/{acc}.biosample', acc=get_accessions_from_runinfo(rules.all.input.runinfo))
+		expand('biosamples/{acc}.biosample',
+		       acc=get_accessions_from_runinfo(rules.download_runinfo.output))
 
 	output:
 		'metadata.tsv'
