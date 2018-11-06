@@ -1,31 +1,17 @@
-localrules: all
-
-import pandas as pd
-
 __author__ = 'Dillon Barker <dillon.barker@canada.ca>'
-
-def get_accessions_from_runinfo(runinfo_path):
-
-	if isinstance(runinfo_path, bytes):
-		path = runinfo_path.decode()
-	else:
-		path = runinfo_path
-
-	runinfo = pd.read_csv(path, sep=',', header=None)
-
-	return list(runinfo.iloc[:, 0])
 
 elink_cmd = 'elink -target sra | ' if config['db'] != 'sra' else ''
 
 rule all:
 	input:
 		runinfo='{0}_runinfo.csv'.format(config['query']),
-		assemblies=expand('genomes/{accession}.fasta',
-			accession=get_accessions_from_runinfo('{0}_runinfo.csv'.format(config['query'])))
+		assemblies=dynamic('genomes/{accession}.fasta'),
+		metadata='metadata.tsv'
 
 rule download_runinfo:
 	output:
 		'{0}_runinfo.csv'.format(config['query'])
+		#rules.all.input.runinfo
 	shell:
 		'''
 		esearch -query {{config[query]}} -db {{config[db]}} | {}
@@ -36,6 +22,22 @@ rule download_runinfo:
         {{output}}
 		'''.format(elink_cmd).replace('\n', '')
 
+rule get_accessions:
+	input:
+		rules.download_runinfo.output
+
+	output:
+		dynamic('accessions/{acc}')
+
+	run:
+		import pandas as pd
+		from pathlib import Path
+		accessions = Path('accessions/')
+
+		runinfo = pd.read_csv(input[0], sep=',', header=None)
+		for acc in runinfo.iloc[:, 0]:
+			dummy = accessions / Path(acc)
+			dummy.touch()
 rule assemble:
 	input:
 		fwd='fastqs/{accession}_1.fastq.gz',
@@ -50,6 +52,8 @@ rule assemble:
 		'--cpus {threads} --ram 12 --force'
 
 rule download_fastq:
+	input:
+		'accessions/{accession}'
 	output:
 		fwd='fastqs/{accession}_1.fastq',
 		rev='fastqs/{accession}_2.fastq'
@@ -91,8 +95,7 @@ rule download_biosample:
 
 rule tabulate_biosamples:
 	input:
-		expand('biosamples/{acc}.biosample',
-		       acc=get_accessions_from_runinfo(rules.download_runinfo.output))
+		biosamples=dynamic('biosamples/{acc}.biosample')
 
 	output:
 		'metadata.tsv'
