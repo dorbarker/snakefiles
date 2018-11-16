@@ -75,7 +75,7 @@ rule compress_fastq:
 
 rule symlink_genome:
 	input:
-		'assemblies/{accession}/contigs.fa'
+		rules.assemble.output
 	output:
 		'genomes/{accession}.fasta'
 	shell:
@@ -83,7 +83,7 @@ rule symlink_genome:
 
 rule download_biosample:
 	input:
-		'genomes/{accession}.fasta'
+		rules.symlink_genome.output
 
 	output:
 		'biosamples/{accession}.biosample'
