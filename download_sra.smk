@@ -12,6 +12,9 @@ rule download_runinfo:
 	output:
 		'{0}_runinfo.csv'.format(config['query'])
 		#rules.all.input.runinfo
+	conda:
+		'envs/entrez-direct.yaml'
+
 	shell:
 		'''
 		esearch -query {{config[query]}} -db {{config[db]}} | {}
@@ -38,14 +41,21 @@ rule get_accessions:
 		for acc in runinfo.iloc[:, 0]:
 			dummy = accessions / Path(acc)
 			dummy.touch()
+
 rule assemble:
 	input:
 		fwd='fastqs/{accession}_1.fastq.gz',
 		rev='fastqs/{accession}_2.fastq.gz'
+
 	output:
 		'assemblies/{accession}/contigs.fa'
+
+	conda:
+		'envs/shovill.yaml'
+
 	threads:
 		8
+
 	shell:
 		'shovill --R1 {input.fwd} --R2 {input.rev} '
 		'--outdir assemblies/{wildcards.accession} '
@@ -54,11 +64,17 @@ rule assemble:
 rule download_fastq:
 	input:
 		'accessions/{accession}'
+
 	output:
 		fwd='fastqs/{accession}_1.fastq',
 		rev='fastqs/{accession}_2.fastq'
+
 	threads:
 		8
+
+	conda:
+		'envs/sra-tools.yaml'
+
 	shell:
 		'fasterq-dump -O fastqs --mem 500MB --threads {threads} '
 		'{wildcards.accession}'
@@ -87,6 +103,9 @@ rule download_biosample:
 
 	output:
 		'biosamples/{accession}.biosample'
+
+	conda:
+		'envs/entrez-direct.yaml'
 
 	shell:
 		'esearch -db sra -query {wildcards.accession} | '
