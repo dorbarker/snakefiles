@@ -1,0 +1,15 @@
+{
+	"__default__":
+	{
+		"partition": "NMLResearch",
+		"mem": "1000"
+	},
+	"annotate":
+	{
+		"mem": "4000"
+	},
+	"pangenome":
+	{
+		"mem": "1003520"
+	}
+}

@@ -43,4 +43,6 @@ rule pangenome:
 	shell:
 		'roary '
 		'-f  pangenome '
+		'-p {threads} '
+		'-cd 99.9 '
 		'{input}'
