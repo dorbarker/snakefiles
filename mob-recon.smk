@@ -1,8 +1,9 @@
 from pathlib import Path
 
+fastas = [fasta.stem for fasta in Path('genomes').glob('*.fasta')
+
 rule all:
-	input: expand('plasmid_reconstructions/{name}/contig_report.txt',
-				  name=[fasta.stem for fasta in Path('.').glob('*.fasta'))
+	input: expand('plasmid_reconstructions/{name}/contig_report.txt', name=fastas)
 
 rule mobrecon:
 	input:
