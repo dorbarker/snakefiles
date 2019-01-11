@@ -22,4 +22,4 @@ rule mobrecon:
 		32
 
 	shell:
-		'mob_recon -n {threads} -i {input} -o {params.outdir}'
+		'mob_recon --run_typer -n {threads} -i {input} -o {params.outdir}'
