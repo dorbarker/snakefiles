@@ -17,6 +17,9 @@ rule define_wgmlst:
 	threads:
 		32
 
+	conda:
+		'envs/chewbbaca.yaml'
+
 	shell:
 		'chewie CreateSchema -i genomes/ -o {output} '
 		'--cpu {threads} --ptf {params.training_file}'
@@ -34,6 +37,9 @@ rule allele_call:
 	threads:
 		32
 
+	conda:
+		'envs/chewbbaca.yaml'
+
 	shell:
 		'chewie AlleleCall -i genomes/ -g {input} -o {output} '
 		'--cpu {threads} --ptf {params.training_file}'
@@ -45,6 +51,9 @@ rule evaluate_schema:
 	output:
 		directory('allele_call_evaluation')
 
+	conda:
+		'envs/chewbbaca.yaml'
+
 	shell:
 		'chewie TestGenomeQuality -i {input} -o {output} -n 24 -t 500 -s 5'
 
@@ -55,6 +64,9 @@ rule extract_cgmlst:
 
 	output:
 		'cgmlst_{presence}/cgMLST.tsv'
+
+	conda:
+		'envs/chewbbaca.yaml'
 
 	shell:
 		'chewie -i {input} -o cgmlst_{presence} -p {presence}'

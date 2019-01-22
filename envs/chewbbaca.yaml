@@ -1,0 +1,6 @@
+channels:
+        - bioconda
+dependencies:
+        - blast
+        - prodigal
+        - chewbbaca
