@@ -11,7 +11,7 @@ rule all:
 rule download_runinfo:
 	output:
 		'{0}_runinfo.csv'.format(config['query'])
-		#rules.all.input.runinfo
+	
 	conda:
 		'envs/entrez-direct.yaml'
 
@@ -22,7 +22,7 @@ rule download_runinfo:
 		grep GENOMIC |
 		grep -v METAGENOMIC |
 		grep {{config[filter_by]}} >
-        {{output}}
+        	{{output}}
 		'''.format(elink_cmd).replace('\n', '')
 
 rule get_accessions:
@@ -38,9 +38,15 @@ rule get_accessions:
 		accessions = Path('accessions/')
 
 		runinfo = pd.read_csv(input[0], sep=',', header=None)
+		
 		for acc in runinfo.iloc[:, 0]:
-			dummy = accessions / Path(acc)
-			dummy.touch()
+			
+			try:
+				dummy = accessions / Path(acc)
+				dummy.touch(exist_ok=False)
+			
+			except FileExistsError:
+				continue
 
 rule assemble:
 	input:
