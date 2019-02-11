@@ -26,6 +26,7 @@ rule annotate:
 
 	shell:
 		'prokka '
+		'--force '
 		'--outdir annotations/{wildcards.accession} '
 		'--prefix {wildcards.accession} '
 		'{input}'
