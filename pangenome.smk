@@ -13,7 +13,6 @@ def annotated(wildcards):
 rule all:
 	input:
 		'pangenome/gene_presence_absence.Rtab'
-
 rule annotate:
 	input:
 		'genomes/{accession}.fasta'
@@ -36,14 +35,38 @@ rule pangenome:
 		annotated
 
 	output:
-		'pangenome/gene_presence_absence.Rtab'
-
+		'accessory_binary_genes.fa',
+		'accessory_binary_genes.fa.newick',
+		'accessory_graph.dot',
+		'accessory.header.embl',
+		'accessory.tab',
+		'blast_identity_frequency.Rtab',
+		'clustered_proteins',
+		'core_accessory_graph.dot',
+		'core_accessory.header.embl',
+		'core_accessory.tab',
+		'gene_presence_absence.csv',
+		'gene_presence_absence.Rtab',
+		'number_of_conserved_genes.Rtab',
+		'number_of_genes_in_pan_genome.Rtab',
+		'number_of_new_genes.Rtab',
+		'number_of_unique_genes.Rtab',
+		'summary_statistics.txt'
 	conda:
 		'envs/roary.yaml'
 
 	shell:
 		'roary '
-		'-f  pangenome '
 		'-p {threads} '
 		'-cd 99.9 '
 		'{input}'
+
+rule tidy_pangenome:
+	input:
+		rules.pangenome.output
+	output:
+		'pangenome/gene_presence_absence.Rtab'
+	params:
+		directory='pangenome/'
+	shell:
+		'mv -t {params.directory} {input}'
