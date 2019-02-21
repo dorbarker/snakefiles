@@ -25,29 +25,29 @@ rule call:
 		1
 
 	shell:
-		'fsac call -a {ALLELES} -i {input} -o {output}'
+		'fsac call -a alleles/ -i {input} -o {output}'
 
 rule update:
 	input:
-		expand('{JSONDIR}/{name}.json', JSONDIR=JSONDIR, name=NAMES)
+		expand('jsons/{name}.json', name=NAMES)
 
 
 	output:
 		touch('.updated')
 
 	shell:
-		'fsac update -a {ALLELES} -j {JSONDIR}'
+		'fsac update -a alleles/ -j jsons/'
 
 rule create_table:
 	input:
-		expand('{JSONDIR}/{name}.json', JSONDIR=JSONDIR, name=NAMES),
+		expand('jsons/{name}.json', name=NAMES),
 		'.updated'
 
 	output:
 		'calls.csv'
 
 	shell:
-		'fsac tabulate -j {JSONDIR} -o {output} -d ,'
+		'fsac tabulate -j jsons/ -o {output} -d ,'
 
 
 rule create_pristine:

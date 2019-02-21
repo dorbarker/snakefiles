@@ -54,6 +54,9 @@ rule pangenome:
 		'summary_statistics.txt'
 	conda:
 		'envs/roary.yaml'
+	
+	threads:
+		64
 
 	shell:
 		'roary '
