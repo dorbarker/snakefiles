@@ -23,6 +23,9 @@ rule call:
 
 	threads:
 		1
+	
+	conda:
+		'envs/fsac.yaml'
 
 	shell:
 		'fsac call -a alleles/ -i {input} -o {output}'
@@ -35,6 +38,9 @@ rule update:
 	output:
 		touch('.updated')
 
+	conda:
+		'envs/fsac.yaml'
+
 	shell:
 		'fsac update -a alleles/ -j jsons/'
 
@@ -45,6 +51,9 @@ rule create_table:
 
 	output:
 		'calls.csv'
+
+	conda:
+		'envs/fsac.yaml'
 
 	shell:
 		'fsac tabulate -j jsons/ -o {output} -d ,'
