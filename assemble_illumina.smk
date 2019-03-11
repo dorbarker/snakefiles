@@ -31,5 +31,8 @@ rule symlink_illumina:
 	output:
 		'genomes/{sample}.fasta'
 
+	group:
+		'fasta_symlink'
+
 	shell:
 		'ln -sr {input} {output}'
