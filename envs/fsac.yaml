@@ -1,0 +1,6 @@
+channels:
+        - bioconda
+        - dorbarker
+dependencies:
+        - blast
+        - fsac
