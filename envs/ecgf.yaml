@@ -1,10 +1,13 @@
 channels:
-        - bioconda
+- defaults
+- conda-forge
+- bioconda
 dependencies:
-        - python=3.7
-        - git
-        - blast
-        - biopython
-        - numpy
-        #- pip:
-        #        - "--editable=git+https://github.com/dorbarker/CGFPrediction.git@improvements"
+- git
+- python=3.7
+- pip
+- numpy
+- biopython
+- blast
+- pip:
+  - "git+https://github.com/dorbarker/CGFPrediction.git@improvements"

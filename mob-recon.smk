@@ -3,11 +3,12 @@ from pathlib import Path
 fastas = [fasta.stem for fasta in Path('genomes').glob('*.fasta')]
 
 rule all:
-	input: expand('plasmid_reconstructions/{name}/.mob_typer', name=fastas)
-
+	input:
+		'plasmid_counts.txt',
+		'plasmid_summary.txt'
 rule mobinit:
 	output:
-		touch('.mob_init_databses')
+		touch('.mob_init_databases')
 	conda:
 		'envs/mob-suite.yaml'
 	shell:
@@ -50,3 +51,14 @@ rule mobtyper:
 		'for i in plasmid_reconstructions/{wildcards.name}/plasmid_*.fasta; do '
 		'    mob_typer -n {threads} --infile $i --outdir plasmid_reconstructions/{wildcards.name}; '
                 'done'
+
+rule summarize:
+	input: 
+		expand('plasmid_reconstructions/{name}/.mob_typer', name=fastas)
+
+	output:
+		'plasmid_counts.txt',
+		'plasmid_summary.txt'
+
+	script:
+		'scripts/tabulate_plasmids.py'

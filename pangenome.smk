@@ -23,9 +23,13 @@ rule annotate:
 	conda:
 		'envs/prokka.yaml'
 
+	threads:
+		8
+
 	shell:
 		'prokka '
 		'--force '
+		'--cpus 8 '
 		'--outdir annotations/{wildcards.accession} '
 		'--prefix {wildcards.accession} '
 		'{input}'
@@ -56,13 +60,14 @@ rule pangenome:
 		'envs/roary.yaml'
 	
 	threads:
-		64
+		144
 
 	shell:
-		'roary '
-		'-p {threads} '
-		'-cd 99.9 '
-		'{input}'
+		'find annotations/ -name "*.gff" -exec roary -p {threads} -cd 99.9 "{{}}" +'
+		# 'roary '
+		# '-p {threads} '
+		# '-cd 99.9 '
+		#'{input}'
 
 rule tidy_pangenome:
 	input:

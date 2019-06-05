@@ -1,12 +1,7 @@
 from pathlib import Path
 import os.path
 
-JSONDIR = 'jsons'
-GENOMES = 'genomes'
-ALLELES = 'alleles'
-TEMPDIR = 'tmp'
-
-NAMES = [Path(fasta).stem for fasta in Path(GENOMES).glob('*.fasta')]
+NAMES = [Path(fasta).stem for fasta in Path('genomes/').glob('*.fasta')]
 
 ruleorder: update > create_table
 
@@ -28,7 +23,7 @@ rule call:
 		'envs/fsac.yaml'
 
 	shell:
-		'fsac call -a alleles/ -i {input} -o {output}'
+		'fsac call -a {config[alleles]} -i {input} -o {output}'
 
 rule update:
 	input:
@@ -42,7 +37,7 @@ rule update:
 		'envs/fsac.yaml'
 
 	shell:
-		'fsac update -a alleles/ -j jsons/'
+		'fsac update -a {config[alleles]} -j jsons/'
 
 rule create_table:
 	input:
