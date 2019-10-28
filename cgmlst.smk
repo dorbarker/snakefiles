@@ -18,7 +18,7 @@ rule call:
 
 	threads:
 		1
-	
+
 	conda:
 		'envs/fsac.yaml'
 
@@ -37,7 +37,7 @@ rule update:
 		'envs/fsac.yaml'
 
 	shell:
-		'fsac update -a {config[alleles]} -j jsons/'
+		'fsac update -a {config[alleles]} -j jsons/ -g genomes/'
 
 rule create_table:
 	input:
@@ -56,14 +56,15 @@ rule create_table:
 
 rule create_pristine:
 	input:
-		'calls.csv'
+		rules.create_table.output
+
 	output:
 		'pristine.csv'
 	run:
 		import pandas as pd
 		calls = pd.read_csv(input[0], sep=',', index_col=0, header=0)
 		pristine = calls.loc[[not any(v < 1) for i, v in calls.iterrows()]]
-		pristine.to_csv('pristine.csv', sep=',', header=True, index=True)
+		pristine.to_csv(output[0], sep=',', header=True, index=True)
 
 rule clean:
 	shell:

@@ -100,6 +100,10 @@ rule symlink_genome:
 		rules.assemble.output
 	output:
 		'genomes/{accession}.fasta'
+
+	group:
+		'symlinks'
+
 	shell:
 		'ln -sr {input} {output}'
 
@@ -109,6 +113,9 @@ rule download_biosample:
 
 	output:
 		'biosamples/{accession}.biosample'
+
+	group:
+		'biosamples'
 
 	conda:
 		'envs/entrez-direct.yaml'

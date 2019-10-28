@@ -1,7 +1,8 @@
 {
         "__default__":
         {
-                "mem": "1000"
+                "mem": "1000",
+		"partition": "NMLResearch"
         },
         "assemble":
         {

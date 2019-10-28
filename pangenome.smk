@@ -55,6 +55,7 @@ rule pangenome:
 		'number_of_genes_in_pan_genome.Rtab',
 		'number_of_new_genes.Rtab',
 		'number_of_unique_genes.Rtab',
+		'pan_genome_reference.fa',
 		'summary_statistics.txt'
 	conda:
 		'envs/roary.yaml'

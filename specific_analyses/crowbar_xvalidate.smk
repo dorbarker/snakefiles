@@ -2,6 +2,10 @@ from pathlib import Path
 
 original_jsons = list(Path('jsons').glob('*.json'))
 
+rule all:
+	input:
+		expand('experiment_{n}/.copied', n=range(10))
+
 rule extract_pristine_calls:
 	input:
 		'calls.csv'

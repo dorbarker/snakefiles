@@ -11,7 +11,9 @@ def arguments():
     parser.add_argument('parent',
                         type=Path,
                         help='Parent directory containing directories for each strain')
+    
     parser.add_argument('outdir',
+                        default=Path('.'),
                         type=Path,
                         help='Output directory')
 
@@ -28,15 +30,15 @@ def arguments():
 
 def main():
 
-    args = arguments()
+    # args = arguments()
 
-    joined_table = join_plasmid_typer_reports(args.parent)
+    joined_table = join_plasmid_typer_reports(Path('plasmid_reconstructions'))
 
     counted_plasmids = count_plasmids(joined_table)
 
-    joined_table.to_csv(args.outdir / 'plasmid_summary.txt', sep='\t')
+    joined_table.to_csv('plasmid_summary.txt', sep='\t')
 
-    counted_plasmids.to_csv(args.outdir / 'plasmid_counts.txt', sep='\t')
+    counted_plasmids.to_csv('plasmid_counts.txt', sep='\t')
 
 
 def join_plasmid_typer_reports(strains_dir: Path) -> pd.DataFrame:
@@ -55,9 +57,8 @@ def join_plasmid_typer_reports(strains_dir: Path) -> pd.DataFrame:
 
         headers.insert(0, 'strain')
 
-        joined_table.reindex(headers, axis=1)
+        return joined_table.reindex(headers, axis=1)
 
-        return joined_table
 
     strains = (p for p in strains_dir.glob('*') if p.is_dir())
 
