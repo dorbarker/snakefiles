@@ -1,5 +1,12 @@
 from pathlib import Path
 import os.path
+import os
+
+for env_var in ('OPENBLAS_NUM_THREADS',
+                'OMP_NUM_THREADS',
+                'MKL_NUM_THREADS',
+                'NUMEXPR_NUM_THREADS'):
+    os.environ[env_var] = '1'
 
 NAMES = [Path(fasta).stem for fasta in Path('genomes/').glob('*.fasta')]
 
